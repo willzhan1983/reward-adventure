@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { dateKeyFromDate, monthKeyFromDate } from "./domain/defaults.js";
-import { ensureCurrentMonth, getMonthSummary, redeemReward, setGoalStatus, toggleDailyCheckIn } from "./domain/calculations.js";
+import { ensureCurrentMonth, getMonthSummary, redeemReward, setGoalStatus, submitDailyCheckIns } from "./domain/calculations.js";
 import { loadState, saveState } from "./domain/storage.js";
 import BottomNav from "./components/BottomNav.jsx";
 import TodayScreen from "./screens/TodayScreen.jsx";
@@ -19,14 +19,14 @@ export default function App() {
   useEffect(() => saveState(state), [state]);
 
   function update(nextState) { setState(nextState); }
-  function toggleTask(taskId, dateKey = dateKeyFromDate(today)) { update(toggleDailyCheckIn(state, dateKey, taskId)); }
+  function submitTasks(taskIds, dateKey = dateKeyFromDate(today)) { update(submitDailyCheckIns(state, dateKey, taskIds)); }
   function toggleGoal(taskId) { update(setGoalStatus(state, monthKey, taskId, !state.months[monthKey]?.goals?.[taskId])); }
   function handleRedeem(rewardId) {
     const result = redeemReward(state, monthKey, rewardId);
     if (!result.ok) window.alert(result.reason); else update(result.state);
   }
 
-  const screenProps = { state, monthKey, summary, today, onToggleTask: toggleTask, onToggleGoal: toggleGoal, onRedeem: handleRedeem, onUpdate: update };
+  const screenProps = { state, monthKey, summary, today, onSubmitTasks: submitTasks, onToggleGoal: toggleGoal, onRedeem: handleRedeem, onUpdate: update };
   return <main className="app-shell">
     <header className="app-header"><div className="brand-mark" aria-hidden="true">★</div><div><h1>获得奖励冒险</h1><p>每天收集一点星星</p></div><div className="points-pill" aria-label={`可用积分${summary.availablePoints}颗星星`}>{summary.availablePoints} <span>★</span></div></header>
     <section className="screen-region">

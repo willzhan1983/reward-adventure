@@ -94,6 +94,13 @@ export function toggleDailyCheckIn(state, dateKey, taskId) {
   return { ...state, months: { ...state.months, [monthKey]: { ...month, days } } };
 }
 
+export function submitDailyCheckIns(state, dateKey, taskIds) {
+  const monthKey = dateKey.slice(0, 7);
+  const month = monthRecord(state, monthKey);
+  const day = Object.fromEntries(taskIds.map((taskId) => [taskId, true]));
+  return { ...state, months: { ...state.months, [monthKey]: { ...month, days: { ...month.days, [dateKey]: day } } } };
+}
+
 export function setGoalStatus(state, monthKey, taskId, status) {
   const month = monthRecord(state, monthKey);
   const goals = { ...month.goals, [taskId]: Boolean(status) };
