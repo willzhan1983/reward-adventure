@@ -1,0 +1,15 @@
+# Local design previews and generated artifacts
+.superpowers/
+.artifacts/
+outputs/
+
+# Local editor and system files
+.DS_Store
+.env
+.env.*
+!.env.example
+
+# Dependencies and build output
+node_modules/
+dist/
+build/
