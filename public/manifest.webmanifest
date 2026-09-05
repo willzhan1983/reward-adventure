@@ -1,0 +1,16 @@
+{
+  "name": "获得奖励冒险",
+  "short_name": "奖励冒险",
+  "description": "本地成长打卡和星星奖励",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fffaf1",
+  "theme_color": "#ffb44a",
+  "lang": "zh-CN",
+  "icons": [{
+    "src": "/icon.svg",
+    "sizes": "any",
+    "type": "image/svg+xml",
+    "purpose": "any maskable"
+  }]
+}
