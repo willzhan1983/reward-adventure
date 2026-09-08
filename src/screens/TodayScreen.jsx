@@ -13,7 +13,7 @@ export default function TodayScreen({ state, monthKey, summary, today, onSubmitT
   const dailyTasks = state.tasks.filter((task) => task.enabled && task.daily);
   const goalTasks = state.tasks.filter((task) => task.enabled && !task.daily);
   const [selected, setSelected] = useState(() => new Set(Object.keys(record).filter((taskId) => record[taskId])));
-  const [submitted, setSubmitted] = useState(false);
+  const [saveStatus, setSaveStatus] = useState(null);
 
   useEffect(() => {
     setSelected(new Set(savedTaskIds ? savedTaskIds.split(",") : []));
@@ -25,13 +25,12 @@ export default function TodayScreen({ state, monthKey, summary, today, onSubmitT
       if (next.has(taskId)) next.delete(taskId); else next.add(taskId);
       return next;
     });
-    setSubmitted(false);
+    setSaveStatus(null);
   }
 
   function submitToday() {
-    onSubmitTasks([...selected]);
-    setSubmitted(true);
+    setSaveStatus(onSubmitTasks([...selected]) ? "saved" : "failed");
   }
 
-  return <div className="screen-content"><div className="screen-heading"><div><span className="date-line">{dateText.format(today)}</span><h2>今天收集星星</h2></div><span className="streak-badge">{summary.currentHomeworkStreak}天连胜</span></div><ProgressHero summary={summary} /><section className="section-block"><div className="section-title"><h3>今日任务</h3><span>{selected.size}/{dailyTasks.length}</span></div>{dailyTasks.map((task) => <TaskCard key={task.id} task={task} checked={selected.has(task.id)} detail={task.id === "homework" ? `连续第${summary.currentHomeworkStreak}天` : `${summary.counts[task.id] || 0}天已完成`} onToggle={() => toggleSelection(task.id)} />)}<button className="submit-checkin" onClick={submitToday}>提交今日打卡</button>{submitted && <p className="save-confirmation" role="status">✓ 今日打卡已保存</p>}</section><section className="section-block compact"><div className="section-title"><h3>阶段目标</h3><span>完成后记录</span></div>{goalTasks.map((task) => <TaskCard key={task.id} task={task} manual checked={Boolean(summary.goals[task.id])} detail={summary.goals[task.id] ? "已记录，积分已计入" : task.description} onToggle={() => onToggleGoal(task.id)} />)}</section></div>;
+  return <div className="screen-content"><div className="screen-heading"><div><span className="date-line">{dateText.format(today)}</span><h2>今天收集星星</h2></div><span className="streak-badge">{summary.currentHomeworkStreak}天连胜</span></div><ProgressHero summary={summary} /><section className="section-block"><div className="section-title"><h3>今日任务</h3><span>{selected.size}/{dailyTasks.length}</span></div>{dailyTasks.map((task) => <TaskCard key={task.id} task={task} checked={selected.has(task.id)} detail={task.id === "homework" ? `连续第${summary.currentHomeworkStreak}天` : `${summary.counts[task.id] || 0}天已完成`} onToggle={() => toggleSelection(task.id)} />)}<button className="submit-checkin" onClick={submitToday}>提交今日打卡</button>{saveStatus === "saved" && <p className="save-confirmation" role="status">✓ 今日打卡已保存</p>}{saveStatus === "failed" && <p className="save-confirmation error" role="alert">保存失败，请退出无痕浏览后重试</p>}</section><section className="section-block compact"><div className="section-title"><h3>阶段目标</h3><span>完成后记录</span></div>{goalTasks.map((task) => <TaskCard key={task.id} task={task} manual checked={Boolean(summary.goals[task.id])} detail={summary.goals[task.id] ? "已记录，积分已计入" : task.description} onToggle={() => onToggleGoal(task.id)} />)}</section></div>;
 }

@@ -10,9 +10,15 @@ export function loadState(storage = globalThis.localStorage, now = new Date()) {
   }
 }
 
-export function saveState(state, storage = globalThis.localStorage) {
-  if (!storage) return;
-  storage.setItem(STORAGE_KEY, JSON.stringify(state));
+export function saveState(state, storage) {
+  try {
+    const target = storage ?? globalThis.localStorage;
+    if (!target) return false;
+    target.setItem(STORAGE_KEY, JSON.stringify(state));
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export function exportBackup(state) {

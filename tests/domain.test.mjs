@@ -59,8 +59,14 @@ test("redemption rejects insufficient balance and succeeds when affordable", () 
 test("state round-trips through local storage and backup JSON", () => {
   const storage = { data: new Map(), getItem(key) { return this.data.get(key) ?? null; }, setItem(key, value) { this.data.set(key, value); } };
   const state = createInitialState(new Date("2026-09-05T12:00:00"));
-  saveState(state, storage);
+  assert.equal(saveState(state, storage), true);
   assert.equal(loadState(storage).settings.appName, "获得奖励冒险");
   assert.equal(importBackup(exportBackup(state)).tasks.length, DEFAULT_TASKS.length);
   assert.equal(DEFAULT_REWARDS.length, 7);
+});
+
+test("saving reports failure when browser storage is unavailable", () => {
+  const state = createInitialState(new Date("2026-09-05T12:00:00"));
+  const blockedStorage = { setItem() { throw new Error("storage blocked"); } };
+  assert.equal(saveState(state, blockedStorage), false);
 });

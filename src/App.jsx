@@ -16,10 +16,16 @@ export default function App() {
   const monthKey = state.settings.currentMonth || monthKeyFromDate(today);
   const summary = useMemo(() => getMonthSummary(state, monthKey, today), [state, monthKey]);
 
-  useEffect(() => saveState(state), [state]);
+  useEffect(() => {
+    saveState(state);
+  }, [state]);
 
-  function update(nextState) { setState(nextState); }
-  function submitTasks(taskIds, dateKey = dateKeyFromDate(today)) { update(submitDailyCheckIns(state, dateKey, taskIds)); }
+  function update(nextState) {
+    const saved = saveState(nextState);
+    setState(nextState);
+    return saved;
+  }
+  function submitTasks(taskIds, dateKey = dateKeyFromDate(today)) { return update(submitDailyCheckIns(state, dateKey, taskIds)); }
   function toggleGoal(taskId) { update(setGoalStatus(state, monthKey, taskId, !state.months[monthKey]?.goals?.[taskId])); }
   function handleRedeem(rewardId) {
     const result = redeemReward(state, monthKey, rewardId);
