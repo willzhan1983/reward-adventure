@@ -42,7 +42,7 @@ test("service worker refreshes navigation and removes old caches", async () => {
   let activation;
   listeners.activate({ waitUntil(promise) { activation = promise; } });
   await activation;
-  assert.deepEqual(deleted, ["reward-adventure-v1"]);
+  assert.deepEqual(deleted, ["reward-adventure-v1", "reward-adventure-v2"]);
 
   let response;
   listeners.fetch({
@@ -50,4 +50,7 @@ test("service worker refreshes navigation and removes old caches", async () => {
     respondWith(promise) { response = promise; },
   });
   assert.equal(await response, networkResponse);
+  let intercepted = false;
+  listeners.fetch({ request: { method: "GET", url: "https://example.com/api/family" }, respondWith() { intercepted = true; } });
+  assert.equal(intercepted, false, "family records must never be served from service worker cache");
 });

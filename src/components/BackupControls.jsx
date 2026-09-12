@@ -18,7 +18,7 @@ export default function BackupControls({ state, onImport }) {
     try {
       const next = importBackup(await file.text());
       const months = Object.keys(next.months).length;
-      if (window.confirm(`备份中包含${months}个月的记录，确定恢复吗？`)) onImport(next);
+      if (window.confirm(`备份中包含${months}个月的记录，将替换全家当前记录。已导出备份并确定恢复吗？`)) await onImport(next);
     } catch (error) { window.alert(error.message); }
     event.target.value = "";
   }

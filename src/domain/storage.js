@@ -1,10 +1,11 @@
 import { STORAGE_KEY, createInitialState } from "./defaults.js";
 import { normaliseState } from "./model.js";
 
-export function loadState(storage = globalThis.localStorage, now = new Date()) {
-  if (!storage) return createInitialState(now);
+export function loadState(storage, now = new Date()) {
   try {
-    return normaliseState(JSON.parse(storage.getItem(STORAGE_KEY)), now);
+    const target = storage ?? globalThis.localStorage;
+    if (!target) return createInitialState(now);
+    return normaliseState(JSON.parse(target.getItem(STORAGE_KEY)), now);
   } catch {
     return createInitialState(now);
   }

@@ -1,4 +1,4 @@
-const CACHE_NAME = "reward-adventure-v2";
+const CACHE_NAME = "reward-adventure-v3";
 const APP_SHELL = ["./", "./index.html", "./manifest.webmanifest", "./icon.svg"];
 
 self.addEventListener("install", (event) => {
@@ -14,6 +14,7 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("fetch", (event) => {
+  if (new URL(event.request.url).pathname.startsWith("/api/") || new URL(event.request.url).pathname.includes("signin-with-chatgpt") || new URL(event.request.url).pathname.includes("signout-with-chatgpt")) return;
   if (event.request.method !== "GET") return;
   if (event.request.mode === "navigate") {
     event.respondWith(fetch(event.request).then((response) => {

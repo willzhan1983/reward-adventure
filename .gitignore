@@ -2,6 +2,7 @@
 .superpowers/
 .artifacts/
 outputs/
+.sites-runtime/
 
 # Local editor and system files
 .DS_Store

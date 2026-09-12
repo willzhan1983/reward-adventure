@@ -121,7 +121,7 @@ export function ensureCurrentMonth(state, now = new Date()) {
   if (state.settings.currentMonth === monthKey && state.months[monthKey]) return state;
   const oldKey = state.settings.currentMonth;
   const oldMonth = state.months[oldKey];
-  const months = { ...state.months, [monthKey]: { days: {}, goals: {}, archivedAt: null } };
+  const months = { ...state.months, [monthKey]: state.months[monthKey] || { days: {}, goals: {}, archivedAt: null } };
   if (oldMonth && oldKey) months[oldKey] = { ...oldMonth, archivedAt: new Date(now).toISOString() };
   return { ...state, settings: { ...state.settings, currentMonth: monthKey }, months };
 }
