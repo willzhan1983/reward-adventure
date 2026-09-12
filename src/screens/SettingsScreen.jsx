@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import BackupControls from "../components/BackupControls.jsx";
 import { CATEGORIES, WEEKDAYS, taskCategory } from "../domain/family.js";
-import { loadState } from "../domain/storage.js";
 
 function TaskEditor({ task, onSave, onDirty, onClose }) {
   useEffect(() => { onDirty(true); }, []);
@@ -19,7 +18,7 @@ function RewardEditor({ reward, onSave, onDirty, onClose }) {
   return <form className="editor-panel" onSubmit={async event => { event.preventDefault(); if (await onSave(draft)) { onDirty(false); onClose(); } }}><h3>{reward.id ? "编辑奖励" : "新增奖励"}</h3><div className="edit-fields"><label>奖励名称<input required maxLength={100} value={draft.label} onChange={e => patch({ label: e.target.value })} /></label><label>奖励内容<input value={draft.description} onChange={e => patch({ description: e.target.value })} /></label><label>所需星星<input required type="number" min="1" max="10000" value={draft.points} onChange={e => patch({ points: Number(e.target.value) })} /></label></div><div className="edit-actions"><button className="primary-button">保存奖励</button><button type="button" className="secondary-button" onClick={() => { if (window.confirm("放弃此处未保存的编辑？")) { onDirty(false); onClose(); } }}>取消</button></div></form>;
 }
 
-export default function SettingsScreen({ state, onUpdate, onDirty, draftReset, cloud }) {
+export default function SettingsScreen({ state, onUpdate, onDirty, draftReset }) {
   const [editing, setEditing] = useState(null);
   useEffect(() => { setEditing(null); }, [draftReset]);
   async function saveItem(kind, draft) {
@@ -27,13 +26,13 @@ export default function SettingsScreen({ state, onUpdate, onDirty, draftReset, c
     const next = draft.id ? list.map(item => item.id === draft.id ? draft : item) : [...list, { ...draft, id: crypto.randomUUID(), enabled: true }];
     return onUpdate({ ...state, [kind]: next });
   }
-  return <div className="screen-content"><div className="screen-heading"><h2>家庭与计划</h2></div><section className="editor-panel family-info"><h3>家庭同步</h3><p>当前成员：{cloud.viewer || "家庭成员"}</p><p>所有获准访问这个站点的家人共用一份记录。在没有待提交修改时，每15秒自动更新，也可以点击上方“刷新”。</p>{cloud.updatedAt && <p>最近保存：{new Date(cloud.updatedAt).toLocaleString("zh-CN")}<br />记录人：{cloud.updatedBy}</p>}<p>添加家人：请站点拥有者在 Sites 的共享设置中按邮箱授予家人访问权限。请保持仅邀请成员可见。</p></section>
+  return <div className="screen-content"><div className="screen-heading"><h2>家庭与计划</h2></div><section className="editor-panel family-info"><h3>本机保存</h3><p>无需登录。记录只保存在当前手机或电脑的浏览器中，不会自动同步到其他设备。</p><p>更换手机或清除浏览器数据前，请先在下方导出备份。</p></section>
     {editing ? editing.kind === "tasks" ? <TaskEditor key={editing.item.id || "new-task"} task={editing.item} onSave={draft => saveItem("tasks", draft)} onDirty={onDirty} onClose={() => setEditing(null)} /> : <RewardEditor key={editing.item.id || "new-reward"} reward={editing.item} onSave={draft => saveItem("rewards", draft)} onDirty={onDirty} onClose={() => setEditing(null)} /> : <>
       <details className="settings-editor" open><summary>每周任务安排</summary><div className="editor-panel">{state.tasks.map(task => <div className="settings-row" key={task.id}><span><strong>{task.label}{!task.enabled ? "（已停用）" : ""}</strong><small>{task.daily ? task.weekdays ? task.weekdays.length ? task.weekdays.slice().sort().map(d => `周${WEEKDAYS[d]}`).join("、") : "暂无安排" : "每天" : "阶段目标"}</small></span><button className="secondary-button" onClick={() => setEditing({ kind: "tasks", item: task })}>编辑</button><button className="tiny-button" onClick={() => saveItem("tasks", { ...task, enabled: !task.enabled })}>{task.enabled ? "停用" : "启用"}</button></div>)}<button className="primary-button" onClick={() => setEditing({ kind: "tasks", item: { label: "", description: "", points: 1, kind: "count", threshold: 1, daily: true, enabled: true } })}>新增日常任务</button></div></details>
       <details className="settings-editor"><summary>奖励与小心愿</summary><div className="editor-panel"><label>首页期待的奖励<select className="month-select" value={state.settings.wishRewardId || state.rewards.find(r => r.enabled)?.id || ""} onChange={e => onUpdate({ ...state, settings: { ...state.settings, wishRewardId: e.target.value } })}>{state.rewards.filter(r => r.enabled).map(r => <option value={r.id} key={r.id}>{r.label} · {r.points} 星</option>)}</select></label>{state.rewards.map(reward => <div className="settings-row" key={reward.id}><span><strong>{reward.label}</strong><small>{reward.points} 颗星{!reward.enabled ? " · 已停用" : ""}</small></span><button className="secondary-button" onClick={() => setEditing({ kind: "rewards", item: reward })}>编辑</button><button className="tiny-button" onClick={() => saveItem("rewards", { ...reward, enabled: !reward.enabled })}>{reward.enabled ? "停用" : "启用"}</button></div>)}<button className="primary-button" onClick={() => setEditing({ kind: "rewards", item: { label: "", description: "", points: 5, enabled: true } })}>新增奖励</button></div></details>
-      <details className="settings-editor"><summary>备份与旧记录迁移</summary><section className="editor-panel"><p className="panel-hint">导出会下载当前家庭记录。导入会替换全家的现有记录，请先导出一份备份。</p><BackupControls state={state} onImport={onUpdate} /><p className="schedule-note">旧网址的记录：在原页面导出备份，再在这里导入。本机在升级前的旧版记录仍保留。</p><button className="secondary-button" onClick={() => { if (window.confirm("用本机升级前的旧版记录替换当前家庭记录？请确认已导出当前家庭备份。")) onUpdate(loadState()); }}>恢复本机旧版记录</button></section></details>
+      <details className="settings-editor"><summary>备份与迁移</summary><section className="editor-panel"><p className="panel-hint">导出会下载这台设备上的记录。导入会替换这台设备的现有记录，请先导出一份备份。</p><BackupControls state={state} onImport={onUpdate} /><p className="schedule-note">要把记录转到另一台手机，请在这台设备导出，再到另一台设备导入。</p></section></details>
     </>}
     {editing?.item.id && <button className="tiny-button danger" onClick={async () => { if (!window.confirm("删除会影响任务和奖励统计，请先导出备份。确定删除？")) return; if (await onUpdate({ ...state, [editing.kind]: state[editing.kind].filter(item => item.id !== editing.item.id) })) { onDirty(false); setEditing(null); } }}>删除此项目</button>}
-    <section className="tip-card"><strong>添加到手机桌面</strong><p>在 Safari 中打开站点，选择分享 → 添加到主屏幕。家人请使用各自获准访问的账号登录。</p></section>
+    <section className="tip-card"><strong>添加到手机桌面</strong><p>在 Safari 中打开站点，选择分享 → 添加到主屏幕。无需登录；每台手机分别保存自己的记录。</p></section>
   </div>;
 }
