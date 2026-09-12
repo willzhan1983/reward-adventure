@@ -1,4 +1,4 @@
-const CACHE_NAME = "reward-adventure-v3";
+const CACHE_NAME = "reward-adventure-v4";
 const APP_SHELL = ["./", "./index.html", "./manifest.webmanifest", "./icon.svg"];
 
 self.addEventListener("install", (event) => {
