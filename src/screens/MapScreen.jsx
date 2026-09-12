@@ -26,7 +26,7 @@ export default function MapScreen({ state, monthKey, today, onSubmitTasks, onTog
   }
   async function save() {
     const ok = await onSubmitTasks([...selected], selectedDay);
-    setMessage(ok ? "✓ 这一天的记录已保存到家庭" : "尚未保存，修改仍保留，请查看上方提示。");
+    setMessage(ok ? "✓ 这一天的记录已保存在这台设备" : "尚未保存，修改仍保留，请查看上方提示。");
     if (ok) { setDirty(false); onDirty(false); }
   }
   const count = Object.values(days).filter(record => Object.values(record).some(Boolean)).length;

@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { createInitialState, DEFAULT_TASKS, DEFAULT_REWARDS } from "../src/domain/defaults.js";
 import * as calculations from "../src/domain/calculations.js";
 import { exportBackup, importBackup, loadState, saveState } from "../src/domain/storage.js";
+import { toggleAndSaveSelection } from "../src/domain/checkin-save.js";
 
 const { getMonthSummary, redeemReward, setGoalStatus, toggleDailyCheckIn } = calculations;
 
@@ -69,4 +70,16 @@ test("saving reports failure when browser storage is unavailable", () => {
   const state = createInitialState(new Date("2026-09-05T12:00:00"));
   const blockedStorage = { setItem() { throw new Error("storage blocked"); } };
   assert.equal(saveState(state, blockedStorage), false);
+});
+
+test("toggling a daily task starts saving the complete selection immediately", async () => {
+  const calls = [];
+  const { next, saved } = toggleAndSaveSelection(new Set(["homework"]), "preview", (taskIds) => {
+    calls.push(taskIds);
+    return true;
+  });
+
+  assert.deepEqual([...next].sort(), ["homework", "preview"]);
+  assert.deepEqual(calls, [["homework", "preview"]]);
+  assert.equal(await saved, true);
 });
