@@ -4,6 +4,7 @@ import { createInitialState, DEFAULT_TASKS, DEFAULT_REWARDS } from "../src/domai
 import * as calculations from "../src/domain/calculations.js";
 import { exportBackup, importBackup, loadState, saveState } from "../src/domain/storage.js";
 import { toggleAndSaveSelection } from "../src/domain/checkin-save.js";
+import { normaliseState } from "../src/domain/model.js";
 
 const { getMonthSummary, redeemReward, setGoalStatus, toggleDailyCheckIn } = calculations;
 
@@ -16,13 +17,36 @@ test("defaults include the 12 tasks and 7 rewards", () => {
   assert.equal(state.tasks.find((task) => task.id === "math").description, "90分以上");
 });
 
-test("daily check-ins toggle and a five-day streak earns homework points", () => {
+test("saved default tasks migrate from monthly conditions to daily completion text", () => {
+  const state = createInitialState(new Date("2026-09-05T12:00:00"));
+  state.tasks.find((task) => task.id === "homework").description = "连续5天在19:50前完成作业";
+  state.tasks.find((task) => task.id === "training").description = "练腿、练嘴一个月不少于20天";
+
+  const migrated = normaliseState(state, new Date("2026-09-05T12:00:00"));
+  assert.equal(migrated.tasks.find((task) => task.id === "homework").description, "在19:50前完成作业");
+  assert.equal(migrated.tasks.find((task) => task.id === "training").description, "完成当天练腿、练嘴");
+});
+
+test("each daily homework check-in earns its configured stars", () => {
   let state = createInitialState(new Date("2026-09-05T12:00:00"));
   for (let n = 1; n <= 5; n += 1) state = toggleDailyCheckIn(state, day(n), "homework");
   assert.equal(getMonthSummary(state, "2026-09").streaks.homework, 5);
-  assert.equal(getMonthSummary(state, "2026-09").earnedPoints, 5);
+  assert.equal(getMonthSummary(state, "2026-09").earnedPoints, 25);
   state = toggleDailyCheckIn(state, day(5), "homework");
   assert.equal(getMonthSummary(state, "2026-09").streaks.homework, 4);
+  assert.equal(getMonthSummary(state, "2026-09").earnedPoints, 20);
+});
+
+test("non-consecutive daily check-ins each earn the task's configured stars", () => {
+  let state = createInitialState(new Date("2026-09-05T12:00:00"));
+  state = toggleDailyCheckIn(state, day(1), "homework");
+  state = toggleDailyCheckIn(state, day(3), "homework");
+
+  const summary = getMonthSummary(state, "2026-09");
+  assert.equal(summary.counts.homework, 2);
+  assert.equal(summary.streaks.homework, 1);
+  assert.equal(summary.earnedPoints, 10);
+  assert.equal(summary.availablePoints, 10);
 });
 
 test("submitting today's tasks replaces that day's selection and keeps other days", () => {
@@ -35,17 +59,17 @@ test("submitting today's tasks replaces that day's selection and keeps other day
   assert.deepEqual(state.months["2026-09"].days["2026-09-05"], { training: true, words: true });
 });
 
-test("piano awards eight points for seven days, not five plus seven", () => {
+test("piano earns its configured stars for every recorded practice day", () => {
   let state = createInitialState(new Date("2026-09-05T12:00:00"));
   for (let n = 1; n <= 7; n += 1) state = toggleDailyCheckIn(state, day(n), "piano");
-  assert.equal(getMonthSummary(state, "2026-09").earnedPoints, 8);
+  assert.equal(getMonthSummary(state, "2026-09").earnedPoints, 35);
 });
 
-test("monthly targets and manual goals award points once", () => {
+test("manual goals still award their configured stars only once per month", () => {
   let state = createInitialState(new Date("2026-09-05T12:00:00"));
-  for (let n = 1; n <= 20; n += 1) state = toggleDailyCheckIn(state, day(n), "training");
   state = setGoalStatus(state, "2026-09", "math", true);
-  assert.equal(getMonthSummary(state, "2026-09").earnedPoints, 17);
+  state = setGoalStatus(state, "2026-09", "math", true);
+  assert.equal(getMonthSummary(state, "2026-09").earnedPoints, 5);
 });
 
 test("redemption rejects insufficient balance and succeeds when affordable", () => {

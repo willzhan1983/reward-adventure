@@ -38,7 +38,7 @@ export default function TodayScreen({ state, monthKey, summary, today, onSubmitT
     {!daily.length && <p className="empty-state">今天没有安排日常任务，好好休息吧。</p>}
     {!!completed.length && <details className="section-block" open><summary>已经完成 {completed.length} 项</summary>{completed.map(card)}</details>}
     <button className="submit-checkin" onClick={submit} disabled={!dirty || saveStatus === "saving"}>{saveStatus === "saving" ? "正在自动保存…" : dirty ? "重新保存" : "今日记录已自动保存"}</button>
-    <p className={`save-confirmation ${saveStatus === "failed" ? "error" : ""}`} role="status">{saveStatus === "saved" ? "✓ 刚刚的打卡已保存在这台设备" : saveStatus === "failed" ? "尚未保存；勾选内容仍保留，请点“重新保存”。" : "勾选或取消任务时会立即保存。完成项数与奖励星星分开计算，达到任务条件才获得星星。"}</p>
+    <p className={`save-confirmation ${saveStatus === "failed" ? "error" : ""}`} role="status">{saveStatus === "saved" ? "✓ 打卡和星星已保存在这台设备" : saveStatus === "failed" ? "尚未保存；勾选内容仍保留，请点“重新保存”。" : "勾选或取消任务时立即保存；每个打卡日独立计分，不要求连续完成。"}</p>
     {wanted && <section className="wish-card"><span>我的下一个小期待</span><h3>{wanted.label}</h3><p>{wanted.description}</p><strong>{summary.availablePoints >= wanted.points ? "星星够啦，可以去奖品页兑换了" : `再积累 ${wanted.points - summary.availablePoints} 颗奖励星星`}</strong></section>}
   </div>;
 }

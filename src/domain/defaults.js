@@ -2,18 +2,18 @@ export const STORAGE_KEY = "reward-adventure-state";
 export const STATE_VERSION = 1;
 
 export const DEFAULT_TASKS = [
-  { id: "homework", label: "作业小勇士", description: "连续5天在19:50前完成作业", kind: "streak", threshold: 5, points: 5, enabled: true, daily: true },
+  { id: "homework", label: "作业小勇士", description: "在19:50前完成作业", kind: "streak", threshold: 5, points: 5, enabled: true, daily: true },
   { id: "math", label: "数学考试", description: "90分以上", kind: "manual", threshold: 1, points: 5, enabled: true, daily: false },
   { id: "chinese", label: "语文考试", description: "93分以上", kind: "manual", threshold: 1, points: 5, enabled: true, daily: false },
   { id: "quiz", label: "小测验", description: "满分2次", kind: "manual", threshold: 1, points: 3, enabled: true, daily: false },
   { id: "english", label: "英语考试", description: "100分", kind: "manual", threshold: 1, points: 5, enabled: true, daily: false },
   { id: "science", label: "科学考试", description: "95分以上", kind: "manual", threshold: 1, points: 5, enabled: true, daily: false },
-  { id: "tidy", label: "整洁魔法", description: "课桌、书包整洁一个月达到20天", kind: "count", threshold: 20, points: 10, enabled: true, daily: true },
-  { id: "preview", label: "预习能量", description: "预习在1小时内完成，累计3次", kind: "count", threshold: 3, points: 4, enabled: true, daily: true },
-  { id: "piano", label: "琴声任务", description: "连续5天得5分；连续7天得8分", kind: "piano", threshold: 5, points: 5, points7: 8, enabled: true, daily: true },
-  { id: "dishes", label: "洗碗小帮手", description: "一个月洗碗6次及以上", kind: "count", threshold: 6, points: 8, enabled: true, daily: true },
-  { id: "training", label: "训练能量站", description: "练腿、练嘴一个月不少于20天", kind: "count", threshold: 20, points: 12, enabled: true, daily: true },
-  { id: "words", label: "英语词书", description: "一个月不少于13天", kind: "count", threshold: 13, points: 8, enabled: true, daily: true },
+  { id: "tidy", label: "整洁魔法", description: "课桌、书包保持整洁", kind: "count", threshold: 20, points: 10, enabled: true, daily: true },
+  { id: "preview", label: "预习能量", description: "完成当天预习", kind: "count", threshold: 3, points: 4, enabled: true, daily: true },
+  { id: "piano", label: "琴声任务", description: "完成当天钢琴练习", kind: "piano", threshold: 5, points: 5, points7: 8, enabled: true, daily: true },
+  { id: "dishes", label: "洗碗小帮手", description: "完成当天洗碗", kind: "count", threshold: 6, points: 8, enabled: true, daily: true },
+  { id: "training", label: "训练能量站", description: "完成当天练腿、练嘴", kind: "count", threshold: 20, points: 12, enabled: true, daily: true },
+  { id: "words", label: "英语词书", description: "完成当天英语词书", kind: "count", threshold: 13, points: 8, enabled: true, daily: true },
 ];
 
 export const DEFAULT_REWARDS = [

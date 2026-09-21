@@ -10,10 +10,8 @@ export function isScheduled(task, date) {
 }
 
 export function rewardRule(task) {
-  if (task.kind === "piano") return `连续5天得${task.points}星，连续7天共${task.points7}星（不重复累加）`;
-  if (task.kind === "streak") return `连续${task.threshold}天完成，得${task.points}星`;
   if (task.kind === "manual") return `达成目标得${task.points}星`;
-  return `本月累计${task.threshold}天，得${task.points}星`;
+  return `每次完成得${task.points}星`;
 }
 
 export function weekCompleted(state, today) {

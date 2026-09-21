@@ -44,15 +44,12 @@ export function currentStreak(state, monthKey, taskId, today = new Date()) {
 function taskAchieved(state, monthKey, task) {
   const record = monthRecord(state, monthKey);
   if (task.kind === "manual") return Boolean(record.goals[task.id]);
-  if (task.kind === "streak") return longestStreak(state, monthKey, task.id) >= task.threshold;
-  if (task.kind === "piano") return longestStreak(state, monthKey, task.id) >= 5;
-  return countTaskDays(state, monthKey, task.id) >= task.threshold;
+  return countTaskDays(state, monthKey, task.id) > 0;
 }
 
 function taskPoints(state, monthKey, task) {
   if (!taskAchieved(state, monthKey, task)) return 0;
-  if (task.kind === "piano") return longestStreak(state, monthKey, task.id) >= 7 ? task.points7 : task.points;
-  return task.points;
+  return task.daily ? countTaskDays(state, monthKey, task.id) * task.points : task.points;
 }
 
 export function getMonthSummary(state, monthKey, today = new Date()) {
